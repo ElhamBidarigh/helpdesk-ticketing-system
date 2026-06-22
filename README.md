@@ -53,7 +53,7 @@ Composite indexes added for the most common filter combinations, avoiding full t
 - Authorization middleware separate from authentication (separation of concerns)
 
 ### 4. Why Raw SQL Instead of an ORM
-Demonstrates direct understanding of SQL — JOINs, indexes, parameterized queries - rather than abstracting database logic behind an ORM. This is intentional: it shows the underlying schema design and query optimization skills explicitly.
+Demonstrates direct understanding of SQL - JOINs, indexes, parameterized queries - rather than abstracting database logic behind an ORM. This is intentional: it shows the underlying schema design and query optimization skills explicitly.
 
 ## Running the Project
 
