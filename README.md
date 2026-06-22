@@ -1,10 +1,10 @@
 # Helpdesk Ticketing System
 
-A full-stack, production-style support ticketing system — built to demonstrate enterprise-ready full-stack engineering: REST API design, relational database schema design with query optimization, JWT authentication, role-based authorization, and containerized deployment.
+A full-stack, production-style support ticketing system, built to demonstrate enterprise-ready full-stack engineering: REST API design, relational database schema design with query optimization, JWT authentication, role-based authorization, and containerized deployment.
 
 ## Why This Project
 
-Built directly on my background as a Senior Technical Support Engineer (LevelUp) — where I handled high-volume ticket queues daily. This project rebuilds that domain from the engineering side: designing the system that powers ticket triage, assignment, and resolution.
+Built directly on my background as a Senior Technical Support Engineer (LevelUp) - where I handled high-volume ticket queues daily. This project rebuilds that domain from the engineering side: designing the system that powers ticket triage, assignment, and resolution.
 
 ## Tech Stack
 
@@ -44,7 +44,7 @@ Implemented via SQL `WHERE` clause injection based on `req.user.role` — not ju
 ```sql
 CREATE INDEX idx_tickets_status_priority ON tickets(status, priority);
 ```
-Composite indexes added for the most common filter combinations, avoiding full table scans as ticket volume grows — directly addresses "query optimization" requirements for enterprise-scale systems.
+Composite indexes added for the most common filter combinations, avoiding full table scans as ticket volume grows - directly addresses "query optimization" requirements for enterprise-scale systems.
 
 ### 3. Security Practices
 - Passwords hashed with bcrypt (never stored in plain text)
@@ -53,11 +53,11 @@ Composite indexes added for the most common filter combinations, avoiding full t
 - Authorization middleware separate from authentication (separation of concerns)
 
 ### 4. Why Raw SQL Instead of an ORM
-Demonstrates direct understanding of SQL — JOINs, indexes, parameterized queries — rather than abstracting database logic behind an ORM. This is intentional: it shows the underlying schema design and query optimization skills explicitly.
+Demonstrates direct understanding of SQL — JOINs, indexes, parameterized queries - rather than abstracting database logic behind an ORM. This is intentional: it shows the underlying schema design and query optimization skills explicitly.
 
 ## Running the Project
 
-### Option 1 — Docker Compose (recommended)
+### Option 1 - Docker Compose (recommended)
 ```bash
 docker-compose up --build
 ```
@@ -65,7 +65,7 @@ docker-compose up --build
 - Backend API: http://localhost:4000/api
 - Database auto-migrates on first run via `schema.sql`
 
-### Option 2 — Manual Setup
+### Option 2 - Manual Setup
 
 **Backend:**
 ```bash
