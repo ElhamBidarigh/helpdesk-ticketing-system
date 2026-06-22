@@ -34,11 +34,11 @@ Built directly on my background as a Senior Technical Support Engineer (LevelUp)
 
 ### 1. Role-Based Access Control (RBAC)
 Three roles with different data visibility:
-- **Admin** — sees all tickets
-- **Agent** — sees only tickets assigned to them
-- **User** — sees only tickets they created
+- **Admin** - sees all tickets
+- **Agent** - sees only tickets assigned to them
+- **User** - sees only tickets they created
 
-Implemented via SQL `WHERE` clause injection based on `req.user.role` — not just UI hiding, but actual query-level enforcement (a common security mistake is filtering only on the frontend).
+Implemented via SQL `WHERE` clause injection based on `req.user.role` - not just UI hiding, but actual query-level enforcement (a common security mistake is filtering only on the frontend).
 
 ### 2. Database Schema & Query Optimization
 ```sql
