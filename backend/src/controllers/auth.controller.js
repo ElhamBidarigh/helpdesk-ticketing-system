@@ -14,12 +14,19 @@ const { signToken } = require("../utils/jwt");
 const SALT_ROUNDS = 10;
 
 async function register(req, res) {
-  const { name, email, password, role = "user" } = req.body;
+  const { name, email, password } = req.body;
+  const role = "user"; // Public signup must never grant staff privileges.
 
   if (!name || !email || !password) {
     return res.status(400).json({ error: "name, email, and password are required" });
   }
 
+  if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string"
+      || !name.trim() || name.length > 100 || email.length > 150
+      || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 8
+      || Buffer.byteLength(password, "utf8") > 72) {
+    return res.status(400).json({ error: "Valid name, email and password (8-72 bytes) are required" });
+  }
   try {
     // چک کن ایمیل تکراری نباشه
     const existing = await pool.query("SELECT id FROM users WHERE email = $1", [email]);

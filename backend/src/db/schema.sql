@@ -54,10 +54,4 @@ CREATE INDEX IF NOT EXISTS idx_comments_ticket_id   ON comments(ticket_id);
 -- Composite index برای query رایج: "تیکت‌های open با priority بالا"
 CREATE INDEX IF NOT EXISTS idx_tickets_status_priority ON tickets(status, priority);
 
--- ── Seed data برای تست سریع ────────────────────────────
--- پسورد همه: "password123" (هش شده با bcrypt)
-INSERT INTO users (name, email, password_hash, role) VALUES
-    ('Admin User',  'admin@helpdesk.com',  '$2b$10$rOzWVe.7P0p1c3hC4qB6NeXKp.7P0p1c3hC4qB6NeXKp.7P0p1c3', 'admin'),
-    ('Agent Sara',  'sara@helpdesk.com',    '$2b$10$rOzWVe.7P0p1c3hC4qB6NeXKp.7P0p1c3hC4qB6NeXKp.7P0p1c3', 'agent'),
-    ('Customer Ali','ali@helpdesk.com',     '$2b$10$rOzWVe.7P0p1c3hC4qB6NeXKp.7P0p1c3hC4qB6NeXKp.7P0p1c3', 'user')
-ON CONFLICT (email) DO NOTHING;
+-- Demo users are created explicitly with npm run seed (never production).

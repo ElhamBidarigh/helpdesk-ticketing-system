@@ -22,6 +22,9 @@ function authenticateToken(req, res, next) {
 
   try {
     const decoded = verifyToken(token);
+    if (!Number.isInteger(decoded.id) || !["admin", "agent", "user"].includes(decoded.role)) {
+      return res.status(403).json({ error: "Invalid token claims" });
+    }
     req.user = decoded;  // { id, email, role } روی request ست میشه
     next();
   } catch (err) {

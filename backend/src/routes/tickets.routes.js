@@ -14,6 +14,13 @@ const {
 
 // همه route های زیر authentication لازم دارن
 router.use(authenticateToken);
+router.param("id", (req, res, next, value) => {
+  const id = Number(value);
+  if (!/^\d+$/.test(value) || !Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ error: "Invalid ticket ID" });
+  }
+  next();
+});
 
 router.get("/",      getTickets);
 router.get("/:id",   getTicketById);
