@@ -24,6 +24,8 @@ export default function TicketDetail({ ticketId, onBack }: Props) {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState("");
+
   const canManage = user?.role === "admin" || user?.role === "agent";
 
   useEffect(() => {
@@ -32,13 +34,15 @@ export default function TicketDetail({ ticketId, onBack }: Props) {
 
   async function load() {
     setLoading(true);
-    const [t, c] = await Promise.all([
-      ticketsApi.getById(ticketId),
-      ticketsApi.getComments(ticketId),
-    ]);
-    setTicket(t);
-    setComments(c);
-    setLoading(false);
+    setError("");
+    try {
+      const [t, c] = await Promise.all([
+        ticketsApi.getById(ticketId), ticketsApi.getComments(ticketId),
+      ]);
+      setTicket(t); setComments(c);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not load ticket");
+    } finally { setLoading(false); }
   }
 
   async function handleStatusChange(status: string) {
@@ -53,6 +57,7 @@ export default function TicketDetail({ ticketId, onBack }: Props) {
     load();
   }
 
+  if (error) return <p role="alert">{error} <button onClick={onBack}>Back</button></p>;
   if (loading || !ticket) return <p style={{ textAlign: "center", padding: 40 }}>Loading…</p>;
 
   return (

@@ -9,7 +9,10 @@
 // ─────────────────────────────────────────────────────
 
 const request = require("supertest");
-const app     = require("../src/server");
+jest.mock("../src/db/pool", () => ({ query: jest.fn() }));
+const pool = require("../src/db/pool");
+const app = require("../src/server");
+beforeEach(() => { pool.query.mockReset(); pool.query.mockResolvedValue({ rows: [] }); });
 
 describe("Auth Endpoints", () => {
 

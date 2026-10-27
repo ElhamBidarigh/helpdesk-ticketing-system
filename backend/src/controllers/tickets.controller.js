@@ -9,6 +9,17 @@
 // ─────────────────────────────────────────────────────
 
 const pool = require("../db/pool");
+const { canAccessTicket } = require("../policies/tickets");
+
+async function authorizeTicket(req, res) {
+  const result = await pool.query("SELECT * FROM tickets WHERE id = $1", [req.params.id]);
+  const ticket = result.rows[0];
+  if (!ticket) { res.status(404).json({ error: "Ticket not found" }); return false; }
+  if (!canAccessTicket(req.user, ticket)) {
+    res.status(403).json({ error: "Access denied" }); return false;
+  }
+  return true;
+}
 
 // ── GET /api/tickets ───────────────────────────────────
 async function getTickets(req, res) {
@@ -78,9 +89,8 @@ async function getTicketById(req, res) {
       return res.status(404).json({ error: "Ticket not found" });
     }
 
-    // دسترسی چک: user فقط تیکت خودش رو ببینه
     const ticket = result.rows[0];
-    if (req.user.role === "user" && ticket.created_by !== req.user.id) {
+    if (!canAccessTicket(req.user, ticket)) {
       return res.status(403).json({ error: "Access denied" });
     }
 
@@ -96,7 +106,10 @@ async function createTicket(req, res) {
   const { title, description, priority = "medium", category = "general" } = req.body;
   const createdBy = req.user.id;
 
-  if (!title || !description) {
+  if (typeof title !== "string" || !title.trim() || title.length > 200
+      || typeof description !== "string" || !description.trim() || description.length > 20000
+      || !["low", "medium", "high", "urgent"].includes(priority)
+      || typeof category !== "string" || category.length > 50) {
     return res.status(400).json({ error: "title and description are required" });
   }
 
@@ -122,15 +135,28 @@ async function updateTicket(req, res) {
   const { status, priority, assigned_to } = req.body;
 
   try {
+    if (!await authorizeTicket(req, res)) return;
+    if ((status !== undefined && !["open", "in_progress", "resolved", "closed"].includes(status))
+        || (priority !== undefined && !["low", "medium", "high", "urgent"].includes(priority))) {
+      return res.status(400).json({ error: "Invalid status or priority" });
+    }
+    if (assigned_to !== undefined) {
+      if (req.user.role !== "admin") return res.status(403).json({ error: "Only admins can assign tickets" });
+      if (assigned_to !== null) {
+        if (!Number.isInteger(assigned_to) || assigned_to <= 0) return res.status(400).json({ error: "Invalid assignee" });
+        const agent = await pool.query("SELECT id FROM users WHERE id = $1 AND role = 'agent'", [assigned_to]);
+        if (!agent.rows.length) return res.status(400).json({ error: "Assignee must be an agent" });
+      }
+    }
     const result = await pool.query(
       `UPDATE tickets
        SET status      = COALESCE($1, status),
            priority    = COALESCE($2, priority),
-           assigned_to = COALESCE($3, assigned_to),
+           assigned_to = CASE WHEN $5 THEN $3 ELSE assigned_to END,
            updated_at  = NOW()
-       WHERE id = $4
+       WHERE id = $4 AND ($6 = 'admin' OR assigned_to = $7)
        RETURNING *`,
-      [status, priority, assigned_to, id]
+      [status, priority, assigned_to, id, assigned_to !== undefined, req.user.role, req.user.id]
     );
 
     if (result.rows.length === 0) {
@@ -149,6 +175,7 @@ async function getComments(req, res) {
   const { id } = req.params;
 
   try {
+    if (!await authorizeTicket(req, res)) return;
     const result = await pool.query(
       `SELECT c.*, u.name AS user_name, u.role AS user_role
        FROM comments c
@@ -170,11 +197,12 @@ async function addComment(req, res) {
   const { body } = req.body;
   const userId = req.user.id;
 
-  if (!body) {
+  if (typeof body !== "string" || !body.trim() || body.length > 20000) {
     return res.status(400).json({ error: "Comment body is required" });
   }
 
   try {
+    if (!await authorizeTicket(req, res)) return;
     const result = await pool.query(
       `INSERT INTO comments (ticket_id, user_id, body)
        VALUES ($1, $2, $3)

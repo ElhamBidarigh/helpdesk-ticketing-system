@@ -1,6 +1,6 @@
 # Helpdesk Ticketing System
 
-A full-stack, production-style support ticketing system, built to demonstrate enterprise-ready full-stack engineering: REST API design, relational database schema design with query optimization, JWT authentication, role-based authorization, and containerized deployment.
+A full-stack, portfolio support ticketing system, built to demonstrate full-stack engineering: REST API design, relational database schema design with query optimization, JWT authentication, role-based authorization, and containerized deployment.
 
 ## Why This Project
 
@@ -59,7 +59,9 @@ Demonstrates direct understanding of SQL - JOINs, indexes, parameterized queries
 
 ### Option 1 - Docker Compose (recommended)
 ```bash
-docker-compose up --build
+docker compose up --build
+# In another terminal, create demo users:
+docker compose exec backend npm run seed
 ```
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:4000/api
@@ -73,7 +75,8 @@ cd backend
 npm install
 cp .env.example .env
 # Update .env with your local Postgres credentials
-npm run migrate    # creates tables + seed data
+npm run migrate    # creates tables
+npm run seed       # creates local demo users; disabled in production
 npm run dev         # starts on :4000
 ```
 
@@ -135,3 +138,7 @@ helpdesk-ticketing-system/
 │   └── Dockerfile
 └── docker-compose.yml     # orchestrates all 3 services
 ```
+
+## Authorization and test scope
+
+Public registration always creates a customer account. Ticket access is enforced for detail, comments and updates. Agents can access assigned tickets; only admins can assign tickets. Tests use a mocked database and do not replace a PostgreSQL integration run. Docker Compose is a local development environment.
